@@ -240,3 +240,78 @@ FROM notifications
 WHERE notificationType = 'Placement'
 AND createdAt >= NOW() - INTERVAL '7 days';
 ```
+
+# Stage 4 - Performance Improvement
+
+## Problem
+
+Notifications are fetched from the database every time a student opens the application.
+
+This causes:
+
+- High database load
+- Increased response time
+- Poor user experience
+- Scalability issues
+
+## Proposed Solutions
+
+### 1. Redis Caching
+
+Store frequently accessed notifications in Redis.
+
+Benefits:
+- Faster response times
+- Reduced database load
+
+Tradeoff:
+- Additional infrastructure required
+- Cache invalidation complexity
+
+### 2. Pagination
+
+Instead of loading all notifications:
+
+Example:
+
+GET /notifications?page=1&limit=20
+
+Benefits:
+- Smaller responses
+- Reduced memory usage
+
+Tradeoff:
+- Multiple API calls may be needed
+
+### 3. Real-Time Notifications
+
+Use WebSocket for instant notification delivery.
+
+Benefits:
+- Better user experience
+- Reduced polling requests
+
+Tradeoff:
+- More complex implementation
+
+### 4. Database Indexing
+
+Use indexes on:
+
+- studentID
+- isRead
+- createdAt
+
+Benefits:
+- Faster queries
+
+Tradeoff:
+- Slightly slower inserts and updates
+
+## Recommended Architecture
+
+Client
+→ Redis Cache
+→ PostgreSQL Database
+
+Real-time updates delivered through WebSocket.
