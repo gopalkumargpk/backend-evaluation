@@ -399,3 +399,31 @@ worker:
 - Redis Queue
 - WebSocket
 ```
+
+# Stage 6 - Priority Inbox
+
+Priority is calculated using:
+
+Priority Score =
+Notification Weight × Recency Score
+
+Weights:
+
+- Placement = 3
+- Result = 2
+- Event = 1
+
+The notifications are sorted in descending order of priority.
+
+Top N notifications are displayed to the user.
+
+Complexity:
+
+- Sorting: O(n log n)
+- Fetching Top N: O(N)
+
+For continuous incoming notifications:
+
+- Use Min Heap
+- Maintain Top N elements only
+- Time Complexity O(log N)
