@@ -315,3 +315,87 @@ Client
 → PostgreSQL Database
 
 Real-time updates delivered through WebSocket.
+
+# Stage 5 - Notification Scalability
+
+## Problems In Current Implementation
+
+The current implementation sends email, saves to database, and pushes notifications one by one.
+
+Issues:
+
+- Slow execution for 50,000 students
+- Failure of one operation may affect others
+- No retry mechanism
+- Not scalable
+- High response time
+
+## What If Email Fails For 200 Students?
+
+The system should not stop processing.
+
+Failed emails should be stored in a retry queue and processed later.
+
+## Improved Architecture
+
+HR
+→ Notification Service
+→ Message Queue (RabbitMQ / Kafka)
+
+Workers:
+
+- Email Worker
+- Database Worker
+- Push Notification Worker
+
+Each worker processes jobs independently.
+
+## Benefits
+
+- Faster processing
+- Better fault tolerance
+- Easy retry mechanism
+- Highly scalable
+
+## Should Database Save And Email Send Happen Together?
+
+No.
+
+These tasks should be asynchronous.
+
+Reason:
+
+- Faster user response
+- Better scalability
+- Independent failure handling
+
+## Revised Pseudocode
+
+```text
+function notify_all(student_ids, message):
+
+    create_notification_job(student_ids, message)
+
+    queue.publish(job)
+
+worker:
+
+    receive_job()
+
+    save_notification_to_db()
+
+    send_email()
+
+    push_notification()
+
+    if failure:
+        retry()
+```
+
+## Recommended Technologies
+
+- RabbitMQ
+- Apache Kafka
+- Redis Queue
+- WebSocket
+```
